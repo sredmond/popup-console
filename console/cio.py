@@ -25,9 +25,6 @@ class ConsoleIO(io.TextIOBase):
         logger.debug('ConsoleIO is writing {!r}'.format(message))
         self.bridge.write(message)
 
-    # def flush(self):
-    #     pass
-
     def readline(self, size=-1):
         return self.bridge.readline()
 

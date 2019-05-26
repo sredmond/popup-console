@@ -17,9 +17,7 @@ INPUT_END = 'input_end'
 
 
 class ConsoleWidget(tk.Text):
-    def __init__(self, master, conn, *args, stderr=sys.stderr, stdout=sys.stdout, **kwargs):
-        self.conn = conn
-
+    def __init__(self, master, out, *args, stderr=sys.stderr, stdout=sys.stdout, **kwargs):
         """Text widget to proxy internal commands."""
         kwargs.setdefault('height', HEIGHT)
         kwargs.setdefault('width', WIDTH)
@@ -30,8 +28,9 @@ class ConsoleWidget(tk.Text):
 
         self.master = master  # Tk master
 
-        self.stderr = stderr
-        self.stdout = stdout
+        self.out = out
+        # self.stderr = stderr
+        # self.stdout = stdout
 
         # Proxy the underlying object.
         self._orig = self._w + "_orig"
@@ -140,11 +139,7 @@ class ConsoleWidget(tk.Text):
         logger.warning('start={}, end={}'.format(self.index('input_start'), self.index(tk.END)))
         logger.warning('Got a line! ' + repr(value))
 
-        # self.stdout.write(value + '\n')
-        # self.stdout.flush()
-        self.conn.send(value)
-
-        self.event_generate("<<LineEntered>>")
+        self.out(value)
 
     def read(self, size=-1):
         return 'from read'

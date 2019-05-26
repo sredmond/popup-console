@@ -1,6 +1,7 @@
 """Run a full background program that launches and manages a ConsoleWidget."""
 from console.widget import ConsoleWidget
 
+import io
 import logging
 import multiprocessing
 import sys
@@ -36,6 +37,13 @@ def monitor(widget, queue, conn):
             queue.put(content)
             widget.event_generate('<<LineReceived>>')
 
+# def mouth(widget, conn):
+#     try:
+#         for line in widget.stdout:
+#             logger.debug('Mouth will say {!r}'.format(line))
+#             conn.send(line)
+#     except EOFError:
+#         raise
 
 
 def main(conn):
@@ -49,7 +57,7 @@ def main(conn):
 
     # Open up a widget.
     root = tk.Tk()
-    widget = ConsoleWidget(root, conn)
+    widget = ConsoleWidget(root, out=conn.send, stdout=io.StringIO())
     widget.pack(fill='both', expand=True)
     root.lift()
     widget.write('Hello! - BG Process\n')
@@ -58,6 +66,9 @@ def main(conn):
     # Spawn a thread to watch the connection and inform the (busy) Tk widget that it has content to consume.
     watchdog = threading.Thread(target=monitor, args=(widget, queue, conn))
     watchdog.start()  # TODO(sredmond): When is this thread joined?
+
+    # speaker = threading.Thread(target=mouth, args=(widget, conn))
+    # speaker.start()  # TODO(sredmond): When is this thread joined?
 
     _set_menubar(root)
 
