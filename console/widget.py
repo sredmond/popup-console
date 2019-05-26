@@ -17,7 +17,9 @@ INPUT_END = 'input_end'
 
 
 class ConsoleWidget(tk.Text):
-    def __init__(self, master, *args, stderr=sys.stderr, stdout=sys.stdout, **kwargs):
+    def __init__(self, master, conn, *args, stderr=sys.stderr, stdout=sys.stdout, **kwargs):
+        self.conn = conn
+
         """Text widget to proxy internal commands."""
         kwargs.setdefault('height', HEIGHT)
         kwargs.setdefault('width', WIDTH)
@@ -76,10 +78,10 @@ class ConsoleWidget(tk.Text):
         # Proxy commands that don't do text modification directly to the underlying Tk object.
         if command not in ('insert', 'delete', 'replace'):
             tk_command = (self._orig, command) + args
-            logger.warning('Forwarding {} {}'.format(command, args))
+            # logger.warning('Forwarding {} {}'.format(command, args))
             return self.tk.call(tk_command)
 
-        logger.warning('Handling {} {}'.format(command, args))
+        # logger.warning('Handling {} {}'.format(command, args))
 
         # User has inserted some content.
         if command == 'insert':
@@ -138,8 +140,9 @@ class ConsoleWidget(tk.Text):
         logger.warning('start={}, end={}'.format(self.index('input_start'), self.index(tk.END)))
         logger.warning('Got a line! ' + repr(value))
 
-        self.stdout.write(value + '\n')
-        self.stdout.flush()
+        # self.stdout.write(value + '\n')
+        # self.stdout.flush()
+        self.conn.send(value)
 
         self.event_generate("<<LineEntered>>")
 

@@ -7,7 +7,7 @@ is just an opaque stream to be written to and read from.
 NOTE(sredmond): Depending on the emergent complexity of this implementation, it
 might be possible to wrap this up into the bridge itself.
 """
-from console.bridge import ConsoleSubprocess
+from console.bridge import ConsoleBridge
 
 import io
 import logging
@@ -19,16 +19,16 @@ class ConsoleIO(io.TextIOBase):
     """Wrap a console subprocess into a TextIO stream."""
     def __init__(self):
         # TODO(sredmond): What is the proper way to initialize the superclass?
-        self.sub = ConsoleSubprocess()
+        self.bridge = ConsoleBridge()
 
     def write(self, message):
         logger.debug('ConsoleIO is writing {!r}'.format(message))
-        self.sub.write(message)
+        self.bridge.write(message)
 
-    def flush(self):
-        self.sub.flush()
+    # def flush(self):
+    #     pass
 
     def readline(self, size=-1):
-        return self.sub.readline()
+        return self.bridge.readline()
 
     # TODO(sredmond): Implement the rest of the TextIO methods.

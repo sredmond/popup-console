@@ -11,15 +11,11 @@ original_stdin = sys.stdin
 original_stdout = sys.stdout
 
 
-def setup(capture=True, force_flush=True):
+def setup(capture=True):
     io = ConsoleIO()
     if capture:
         sys.stdin = io
         sys.stdout = io  # TODO(sredmond): Maybe use contextlib.redirect_stdout
         # TODO(sredmond): Also capture stderr?
-
-    if force_flush:
-        # This is SO GROSS. Doesn't it just feel bad to autoflush?
-        builtins.print = functools.partial(print, flush=True)
 
     return io
